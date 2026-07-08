@@ -1,17 +1,25 @@
-# CARD Course Implementation
+# CARD: Correlation Aware Restoration with Diffusion
 
-This repository contains a course implementation and presentation package for
-`CARD: Correlation Aware Restoration with Diffusion` (`card_paper.pdf`).
+This project studies and implements the main idea from `card_paper.pdf`. The
+problem is image restoration when the noise is spatially correlated, which is a
+common situation in real camera sensors, especially rolling-shutter sensors.
 
-CARD addresses image restoration when camera noise is spatially correlated
-rather than independent. The paper's measurement model is:
+Many restoration methods assume independent Gaussian noise:
+
+```text
+y = Hx0 + z
+z ~ N(0, sigma_y^2 I)
+```
+
+CARD uses a more realistic correlated-noise model:
 
 ```text
 y = Hx0 + n
 n ~ N(0, sigma_y^2 Sigma)
 ```
 
-The key idea is to whiten the measurement equation:
+The covariance matrix `Sigma` describes the relation between neighboring noise
+values. CARD whitens the measurement equation:
 
 ```text
 W = Sigma^(-1/2)
@@ -20,82 +28,80 @@ H_tilde = W H
 W Sigma W^T = I
 ```
 
-Then DDRM-style diffusion restoration is applied in the spectral basis of
-`H_tilde`, not the original `H`.
+After whitening, the noise becomes independent again, so diffusion restoration
+can be applied in the spectral domain of `H_tilde`.
 
-## Repository Contents
+## Files
 
-- `card_paper.pdf` - source paper.
-- `card/` - small CPU implementation of covariance modeling, whitening, and a
-  covariance-aware denoising demo.
-- `main.py` - runs the CPU demo and writes `results/card_demo.png`.
-- `card_guided_diffusion_colab.ipynb` - Google Colab diffusion implementation
-  closer to the paper methodology.
-- `report.tex` / `report.pdf` - paper-aligned written report.
-- `presentation.tex` / `presentation.pdf` - paper-aligned slide deck.
-- `tests/` - focused tests for whitening and the CPU pipeline.
+- `card_paper.pdf` - reference paper.
+- `card/` - Python implementation for covariance modeling, whitening, and a CPU
+  denoising experiment.
+- `main.py` - runs the CPU experiment.
+- `card_guided_diffusion_colab.ipynb` - Google Colab notebook using a pretrained
+  diffusion model.
+- `report.tex` / `report.pdf` - written project report.
+- `presentation.tex` / `presentation.pdf` - presentation slides.
+- `tests/` - tests for whitening and the demo pipeline.
 
-## Implementation Scope
+## CPU Experiment
 
-This project has two implementation levels.
+The CPU version is a compact implementation of the image-processing part of the
+method. It demonstrates:
 
-### CPU demo
+- synthetic correlated Gaussian noise;
+- patchwise covariance construction;
+- coloring and whitening transforms;
+- a Gaussian denoising baseline;
+- a covariance-aware restoration baseline;
+- PSNR and global SSIM measurements.
 
-The Python package is intentionally compact and reproducible on CPU. It
-demonstrates:
-
-- patchwise correlated Gaussian noise;
-- covariance matrix construction;
-- coloring transform for generating correlated noise;
-- whitening transform with `W Sigma W^T ~= I`;
-- Gaussian denoising baseline;
-- covariance-aware restoration baseline;
-- PSNR and global SSIM metrics.
-
-Run it with:
+Run:
 
 ```bash
 uv sync
 uv run python main.py
 ```
 
-Output:
+The output image is saved to:
 
 ```text
 results/card_demo.png
 ```
 
-### Colab diffusion implementation
+## Colab Diffusion Experiment
 
-For the version closest to the paper implementation, use:
+The Colab notebook uses a pretrained OpenAI guided-diffusion model and applies
+the covariance-aware restoration idea to denoising. In this experiment the
+degradation operator is identity:
 
 ```text
-card_guided_diffusion_colab.ipynb
+H = I
+H_tilde = W
 ```
 
-Run it in Google Colab with GPU enabled. The notebook:
+The notebook:
 
-- clones OpenAI `guided-diffusion`;
-- downloads the public `64x64_diffusion.pt` checkpoint;
 - builds a patchwise covariance matrix;
-- generates correlated Gaussian measurements;
-- computes the whitening transform;
-- uses the SVD of `H_tilde = W H`;
-- restores multiple denoising test images with a frozen diffusion prior;
-- compares noisy, Gaussian baseline, and CARD-style restored outputs.
+- generates correlated noisy measurements;
+- computes the whitening matrix;
+- uses the singular value decomposition of `H_tilde`;
+- restores several test images;
+- compares noisy, Gaussian baseline, and restored images.
 
-The notebook focuses on denoising, so `H = I` and `H_tilde = W`.
+Run `card_guided_diffusion_colab.ipynb` in Google Colab with GPU enabled.
 
-## Deliverables
+## Report and Presentation
 
-The report and presentation are already compiled:
+The report and slides are included as both source and compiled PDF files:
 
 ```text
-report.pdf        # 7 pages
-presentation.pdf  # 15 slides
+report.tex
+report.pdf
+presentation.tex
+presentation.pdf
 ```
 
-Rebuild them with:
+To rebuild them:
 
 ```bash
 pdflatex -interaction=nonstopmode -halt-on-error report.tex
@@ -112,7 +118,7 @@ uv run ruff check .
 uv run basedpyright
 ```
 
-Current expected status:
+Expected result:
 
 ```text
 4 passed
@@ -120,25 +126,21 @@ All checks passed
 0 errors, 0 warnings, 0 notes
 ```
 
-## Relation to the Paper
+## Current Scope
 
-Aligned with `card_paper.pdf`:
+Implemented:
 
 - correlated Gaussian noise model;
-- covariance-aware restoration problem;
 - patchwise covariance and whitening;
 - synthetic correlated-noise generation;
-- frozen diffusion prior in the Colab notebook;
-- whitened spectral measurement update for the denoising case.
+- CPU denoising experiment;
+- Colab diffusion denoising experiment;
+- PSNR and global SSIM evaluation.
 
-Not yet implemented:
+Not included in this version:
 
-- full original DDRM codebase integration;
+- full DDRM codebase reproduction;
 - real dark-frame covariance estimation;
-- CIN-D evaluation;
+- CIN-D dataset evaluation;
 - LPIPS metric;
-- deblurring and super-resolution tasks.
-
-So the repo should be presented as a faithful course-scale implementation of the
-CARD methodology for denoising, plus a compact CPU demonstration for inspection
-and reproducibility.
+- deblurring and super-resolution experiments.
