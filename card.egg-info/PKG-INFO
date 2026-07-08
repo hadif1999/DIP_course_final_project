@@ -48,6 +48,18 @@ uv run ruff check .
 uv run basedpyright
 ```
 
+## Colab Diffusion Version
+
+For a version closer to the paper methodology, use:
+
+```text
+card_guided_diffusion_colab.ipynb
+```
+
+That notebook is meant to run on Google Colab with a GPU. It clones OpenAI
+`guided-diffusion`, downloads `64x64_diffusion.pt`, generates correlated noise,
+and runs diffusion inference with covariance-whitened measurement guidance.
+
 ## Relation To The Paper
 
 The paper's full CARD method uses a pretrained diffusion prior and modifies DDRM
