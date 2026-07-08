@@ -92,7 +92,6 @@ Run `card_guided_diffusion_colab.ipynb` in Google Colab with GPU enabled.
 
 ## Report and Presentation
 
-The report and slides are included as both source and compiled PDF files:
 
 ```text
 report.pdf
