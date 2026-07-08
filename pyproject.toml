@@ -1,0 +1,54 @@
+[project]
+name = "card"
+version = "0.1.0"
+description = "Reproducible course implementation of correlation-aware image restoration."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.3.1",
+    "pillow>=12.3.0",
+    "rich>=14.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.30.1",
+    "pytest>=8.4.1",
+    "ruff>=0.12.2",
+]
+
+[tool.uv]
+package = true
+
+[tool.setuptools.packages.find]
+include = ["card*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "COM812",
+    "D100",
+    "D101",
+    "D103",
+    "D104",
+    "D203",
+    "D213",
+    "ISC001",
+    "T201",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["S101"]
+
+[tool.basedpyright]
+typeCheckingMode = "all"
+include = ["card", "main.py", "tests"]
+reportMissingTypeStubs = false
+reportAny = false
