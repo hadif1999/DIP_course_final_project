@@ -39,8 +39,8 @@ can be applied in the spectral domain of `H_tilde`.
 - `main.py` - runs the CPU experiment.
 - `card_guided_diffusion_colab.ipynb` - Google Colab notebook using a pretrained
   diffusion model.
-- `report.tex` / `report.pdf` - written project report.
-- `presentation.tex` / `presentation.pdf` - presentation slides.
+- `report.pdf` - written project report.
+- `presentation.pdf` - presentation slides.
 - `tests/` - tests for whitening and the demo pipeline.
 
 ## CPU Experiment
@@ -95,20 +95,10 @@ Run `card_guided_diffusion_colab.ipynb` in Google Colab with GPU enabled.
 The report and slides are included as both source and compiled PDF files:
 
 ```text
-report.tex
 report.pdf
-presentation.tex
 presentation.pdf
 ```
 
-To rebuild them:
-
-```bash
-pdflatex -interaction=nonstopmode -halt-on-error report.tex
-pdflatex -interaction=nonstopmode -halt-on-error report.tex
-pdflatex -interaction=nonstopmode -halt-on-error presentation.tex
-pdflatex -interaction=nonstopmode -halt-on-error presentation.tex
-```
 
 ## Verification
 
